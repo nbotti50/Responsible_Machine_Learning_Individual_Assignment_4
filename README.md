@@ -107,6 +107,12 @@ The following methods were used throughout the entire analysis:
 
 ## Instructions for Reproducing the Results
 
-1. Install required dependencies:
+Install required dependencies, then run notebook file given in repo:
 ```python
 !pip install pandas numpy matplotlib scikit-learn lifelines lime shap dice-ml solas-ai statsmodels scipy
+```
+Open Nick_Botti_RML_Assignment_4_Generalization.ipynb in Google Colab or a local Jupyter environment and run all cells from top to bottom.
+---
+
+## A Statement on AI Usage
+Google Gemini (embedded in Google Colab) was utilized to debug runtime error messages and to assist in the logic for the Population Stability Index (PSI) calculations. Additionally, Gemini helped refine the interpretation of the ICE curves to ensure the findings aligned with the "audit-level reasoning" standards required for this assignment. This usage is consistent with the instructional guidance provided in previous live coding sessions and lectures.
