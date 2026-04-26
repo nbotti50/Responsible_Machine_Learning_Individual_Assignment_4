@@ -1,47 +1,112 @@
-# Responsible Machine Learning Individual Assignment 4: Generalization, Drift, and Robustness
+# Responsible Machine Learning Individual Assignment 4: COMPAS End-to-End Audit
 
-## Project Objective
-The objective of this assignment is to reproduce and extend the lecture pipeline for the COMPAS risk assessment dataset using Python. This analysis moves beyond initial fairness audits to evaluate the **long-term reliability and stability** of the predictive models. The goal is to determine if the model maintains its integrity when faced with new data and to identify potential vulnerabilities through stress testing.
+## The Purpose of the Analysis
+
+This project presents a unified, end-to-end responsible machine learning audit of the COMPAS risk assessment system across Assignments 1–4. The analysis evaluates the model from multiple perspectives including **fairness, explainability, predictive performance, generalization, distribution drift, and robustness under stress testing**.
+
+The goal is to assess not only whether the model is fair and accurate, but also whether it is **interpretable, stable over time, resistant to distribution shift, and robust to perturbations in key features**.
+
+Across the full pipeline, the analysis progresses from fairness diagnostics and explainability (initial assignments) to model reliability and stability (final assignment).
 
 ---
 
-## Technical Methodologies & Evaluation
-This audit focuses on four critical dimensions of model health:
+## Methods Used Across the Full Pipeline (Assignments 1–4)
 
-1. **Distribution Drift (Part A)**: 
-   - Computed **Population Stability Index (PSI)** and **Kolmogorov-Smirnov (KS)** tests for numeric features (e.g., `priors_count`) to identify shifts between training and testing populations.
-   - Implemented **Maximum Mean Discrepancy (MMD²)** in the encoded feature space to detect multivariate drift.
-2. **Generalization (Part B)**: 
-   - Evaluated **AUC, Accuracy, and Log Loss** across both training and testing sets for Logistic Regression and Gradient-Boosted Trees.
-   - Diagnosed overfitting by calculating the performance gaps (e.g., `AUC_gap`) to ensure the model's predictive power is stable.
-3. **Spurious-Correlation Probe (Part C)**: 
-   - Utilized **Counterfactual Swaps** on protected attributes (race, gender) to measure changes in predicted probabilities, ensuring the model does not rely on sensitive or immutable proxies.
-4. **Robustness & Sensitivity (Part D)**: 
-   - Performed stress tests on `priors_count` and generated **Individual Conditional Expectation (ICE) curves** to visualize how individual predictions respond to specific feature perturbations.
-5. **Slice-Based Evaluation (Part E)**: 
-   - Conducted a performance audit across demographic slices (race, gender, age) to monitor for subgroup performance disparities.
+The following methods were used throughout the entire analysis:
+
+### Predictive Modeling & Performance Evaluation
+- **Logistic Regression**: Used to model the probability of receiving a high COMPAS risk score while controlling for demographic and criminal history features.
+- **Gradient Boosted Trees (GBT)**: Used as a nonlinear benchmark model to compare predictive performance and generalization behavior.
+- **Evaluation Metrics**:
+  - AUC (Area Under the Curve)
+  - Accuracy
+  - Log Loss
+- Train vs Test comparisons were used to diagnose **overfitting and generalization gaps**.
+
+---
+
+### Fairness, Disparity, and Harm Analysis
+- **Adverse Impact Ratio (AIR)**: Measured disparities in favorable outcomes across demographic groups.
+- **Error Rate Parity**:
+  - False Positive Rate (FPR)
+  - False Negative Rate (FNR)
+  - Group-wise comparisons to identify uneven model error burdens
+- **Intersectional Analysis**: Evaluated compounded disparities across overlapping demographic attributes.
+- **Standardized Mean Difference (SMD)** and **Mean Difference (ME)**: Quantified magnitude of disparities across groups.
+
+---
+
+### Explainability and Interpretability
+- **SHAP (Shapley Additive Explanations)**:
+  - Global feature importance
+  - Local prediction explanations
+  - Feature contribution magnitude analysis
+- **LIME (Local Interpretable Model-Agnostic Explanations)**:
+  - Individual-level explanations of model predictions
+- **DiCE (Diverse Counterfactual Explanations)**:
+  - Identified minimal feature changes required to alter predictions
+  - Highlighted potential issues with immutable or sensitive features
+
+---
+
+### Survival and Time-to-Event Analysis
+- **Cox Proportional Hazards Model**:
+  - Modeled relationship between COMPAS scores and time-to-recidivism
+- **Kaplan-Meier Survival Curves**:
+  - Estimated probability of non-recidivism over time across risk groups
+  - Compared survival distributions across demographic subgroups
+
+---
+
+### Distribution Drift & Data Shift Detection (New in Assignment 4)
+- **Population Stability Index (PSI)**:
+  - Measured shifts in feature distributions (e.g., `priors_count`)
+- **Kolmogorov–Smirnov (KS) Test**:
+  - Statistical test for univariate distribution differences
+- **Maximum Mean Discrepancy (MMD²)**:
+  - Multivariate drift detection in encoded feature space
+
+---
+
+### Robustness, Sensitivity, and Stress Testing (New in Assignment 4)
+- **Counterfactual Attribute Swaps**:
+  - Tested sensitivity of predictions to changes in race and gender
+- **Stress Testing on `priors_count`**:
+  - Evaluated how prediction probabilities change under systematic feature perturbation
+- **Individual Conditional Expectation (ICE) Curves**:
+  - Visualized individual-level prediction sensitivity to feature changes
+
+---
+
+### Slice-Based Evaluation
+- Performance evaluated across:
+  - Race groups
+  - Gender groups
+  - Age groups
+- Used to identify subgroup-specific degradation in:
+  - Accuracy
+  - Error rates
+  - Predictive stability
 
 ---
 
 ## Python Libraries Used
-- `pandas` – Data manipulation and creation of the final Summary Table.
-- `numpy` – Numerical transformations and array handling.
-- `matplotlib` – Visualizing score distributions and ICE curves.
-- `scikit-learn` – Model training (Logistic Regression/GBT) and performance metrics (AUC, Log Loss).
-- `scipy.stats` – Statistical testing for distribution drift (KS test).
-- `dice-ml` – Generating diverse counterfactual explanations for the robustness probe.
+
+- `pandas` – Data cleaning, feature engineering, subgroup construction, and summary table generation  
+- `numpy` – Numerical transformations and array operations  
+- `matplotlib` – Visualization of survival curves, ICE plots, and fairness comparisons  
+- `scikit-learn` – Model training (Logistic Regression, GBT) and evaluation metrics (AUC, Accuracy, Log Loss)  
+- `lifelines` – Survival analysis (Kaplan-Meier, Cox proportional hazards models)  
+- `shap` – Global and local feature importance analysis  
+- `lime` – Local model interpretability  
+- `dice-ml` – Counterfactual explanation generation and robustness testing  
+- `solas-ai` – Fairness metrics including AIR, SMD, and ME  
+- `statsmodels & scipy.stats` – Statistical testing (e.g., KS tests, z-tests for proportion differences)
 
 ---
 
 ## Instructions for Reproducing the Results
 
-1. **Environment Note**: This notebook was developed and tested on **macOS**. 
-2. **Installation**: Ensure the necessary dependencies are installed by running:
-   ```python
-   !pip install pandas numpy matplotlib scikit-learn dice-ml scipy
-3. Execution: Open Nick_Botti_RML_Assignment_4_Generalization (1).ipynb in Google Colab or a local Jupyter environment and run all cells from top to bottom
-
----
-
-## A Statement on AI usage
-Google Gemini (embedded in Google Colab) was utilized to debug runtime error messages and to assist in the logic for the Population Stability Index (PSI) calculations. Additionally, Gemini helped refine the interpretation of the ICE curves to ensure the findings aligned with the "audit-level reasoning" standards required for this assignment. This usage is consistent with the instructional guidance provided in previous live coding sessions and lectures.
+1. Install required dependencies:
+```python
+!pip install pandas numpy matplotlib scikit-learn lifelines lime shap dice-ml solas-ai statsmodels scipy
